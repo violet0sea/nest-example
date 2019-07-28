@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { CatsModule } from './cats/cats.module';
 import { AppService } from './app.service';
 import { CatsService } from './cats/cats.service';
+import { LoggerMiddleware } from './common/middlewares/logger.middleware';
+import { setUserinfoMiddleware } from './common/middlewares/set-userinfo.middleware';
 
 @Module({
   imports: [
@@ -15,4 +17,8 @@ import { CatsService } from './cats/cats.service';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware, setUserinfoMiddleware).forRoutes('/');
+  }
+}
